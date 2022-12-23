@@ -17,7 +17,7 @@ router.post('/createuser',async (req,res) =>{
     const SALT= await bcrypt.genSalt(10);
     const genpass=await bcrypt.hash(req.body.password,SALT);
 
-    if (!User) {
+    if (!User ) {
       
     
        const user= new AuthModel({
