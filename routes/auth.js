@@ -8,22 +8,10 @@ const fetchuser=require('../middlewares/fetchuser');
 const Jwt_Secret=process.env.Jwt_Secret;
 
 
-router.post('/createuser',[
-body('name',"Your Name must be more than three letters or Please fill the input field").isLength({ min: 3 }),
-body('email',"Your Email must be Unique and check the input field again !").isEmail(),
-body('password',"Your Password wih more than 5 Leter").isLength({ min: 5 }),
-
-body('name',"Name field is empty !").exists(),
-body('email',"Email field is empty !").exists(),
-body('password',"Password field is empty!").exists(),
-],
-async (req,res) =>{
+router.post('/createuser',async (req,res) =>{
     try {
         
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-          return res.status(400).json({ errors: errors.array() });
-        }
+       
     
     const User=await AuthModel.findOne({email:req.body.email});
     const SALT= await bcrypt.genSalt(10);
@@ -32,11 +20,12 @@ async (req,res) =>{
     if (!User) {
       
     
-       const user= await AuthModel.create({
+       const user= new AuthModel({
           name: req.body.name,
           email:req.body.email,
           password: genpass,
         }); 
+       await user.save()
         const data={
             user:{
                 id:user.id
@@ -44,12 +33,12 @@ async (req,res) =>{
         }
         const AuthToken= jwt.sign(data,Jwt_Secret);
 
-    return   await res.json({message:"User Registered Successfully ",data:AuthToken})
+    return   await res.send({message:"User Registered Successfully ",data:AuthToken})
     }  
    
        
     if (User) {
-        return await res.json({message:"Sorry! user already exist with this email "});
+        return await res.send({message:"Sorry! user already exist with this email "});
     }
     } 
     catch (error) {
@@ -67,6 +56,7 @@ body('password',"Password field is empty! ").exists(),
 ],
 async (req,res) =>{
     try {
+      
         const User=await AuthModel.findOne({email:req.body.email});
 
         const errors = validationResult(req);
@@ -78,6 +68,7 @@ async (req,res) =>{
 
     
         if (!User) {
+          success=false
          res.json({Message:"Please type right credentials"});   
 }
 if (User) {
@@ -90,6 +81,7 @@ if (!passwordCompare) {
                 id:User.id
             }
         }
+        
         const AuthToken= await jwt.sign(data,Jwt_Secret);
         return   await res.json({message:"User Logined Successfully ",data:AuthToken})
     

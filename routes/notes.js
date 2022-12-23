@@ -18,8 +18,8 @@ router.get('/viewnotes',fetchuser,async (req,res) =>{
 
 router.post('/createnotes',[
     body('title',"Your Title must be more than three letters or Please fill the input field").isLength({ min: 3 }),
-body('description',"Your Description must be more than twenty letters and check the input field again !").isLength({ min: 20 }),
-body('tags',"Your Password wih more than 5 Leter").isLength({ min: 5 }),
+body('description',"Your Description must be more than twenty letters and check the input field again !").isLength({ max: 20 }),
+body('tags',"Your Tags wih more than 5 Leter").isLength({ max: 5 }),
 
 body('title',"Title field is empty !").exists(),
 body('description',"Description field is empty !").exists(),
